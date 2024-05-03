@@ -228,7 +228,13 @@ def decodeSheet(main , tunes):
         if singleSign[0] != -1:
             main_freq.append([tunes[singleSign[0]] , singleSign[1]])
         else:
-            main_freq.append([0 , singleSign[1]])    
+            main_freq.append([0 , singleSign[1]])
+
+    # 时间线时间点累加
+    last_time = float(0)
+    for i in main_freq:
+        i[1] = i[1] + last_time
+        last_time = i[1]
     return main_freq
 
 
@@ -287,6 +293,6 @@ if __name__ == "__main__":
     print(main)
     main_freq = decodeSheet(main , tunes)
     print(main_freq)
-    main_time = Timerdecode(main_freq , IRC)
-    print(main_time)
-    output(main_time)
+    # main_time = Timerdecode(main_freq , IRC)
+    # print(main_time)
+    # output(main_time)
