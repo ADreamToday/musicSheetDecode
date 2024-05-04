@@ -14,7 +14,7 @@ int length = 561;
 int speed = 160; // 120个音符代码每分钟
 	
 	
-unsigned int Interrupttimes = 0;
+unsigned long int Interrupttimes = 0;
 
 void write()	// 用于pwm输出的
 {
