@@ -43,7 +43,7 @@ def decodeEnviro(code):
 
 def decodeSections(code):
     print("===Decode Section===")
-	
+
     res = {}
     parts_name = ''
     sign = 0
@@ -57,7 +57,7 @@ def decodeSections(code):
             continue
         elif i == "finish" and sign == 1:
             sign = 0
-		
+
         if sign == 1:                   # 添加
             for j in i.split():
                 res[parts_name].append(j)
@@ -81,7 +81,7 @@ def decodeMainSheet(code):
         if sign == 1:
             for j in i.split():
                 res.append(j)
-	
+
     print("===MainSheet Decode Finish===\n")
     return res
 
@@ -96,7 +96,7 @@ def basicDecode():
     sections	= decodeSections(inputsWithRealCode)
     # main = []
     main		= decodeMainSheet(inputsWithRealCode)
-	
+
     print("=====Basci Decode Finish=====\n")
 
     # print(envirs)
@@ -114,7 +114,7 @@ def envirsgen(envirs):
         tunes = soundfreq.stdfreq(tune)
     else:
         tunes = soundfreq.stdfreq('C')
-    
+
     # get speed
     if "speed" in envirs.keys():
         speed = envirs["speed"]
@@ -223,12 +223,18 @@ def singleSignDecode(astr):
 def decodeSheet(main , tunes):
     main_freq = []
     for i in main:
-        
+
         singleSign = singleSignDecode(i)
         if singleSign[0] != -1:
             main_freq.append([tunes[singleSign[0]] , singleSign[1]])
         else:
-            main_freq.append([0 , singleSign[1]])    
+            main_freq.append([0 , singleSign[1]])
+
+    # 时间线时间点累加
+    last_time = float(0)
+    for i in main_freq:
+        i[1] = i[1] + last_time
+        last_time = i[1]
     return main_freq
 
 
@@ -265,7 +271,7 @@ def output(main_Time):
         for i in Timerlist:
             if type(i) == int and i == 0:
                 txt = '{' + '0xff' + ',' + '0xff' + '} , '
-            else:    
+            else:
                 H8 = '0x' + i[2] + i[3]
                 L8 = '0x' + i[4] + i[5]
                 txt = '{' + H8 + ',' + L8 + '} , '
