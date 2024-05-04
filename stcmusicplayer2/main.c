@@ -16,17 +16,17 @@ int speed = 160; // 120个音符代码每分钟
 	
 int Interrupttimes = 0;
 
-void write()
+void write()	// 用于pwm输出的
 {
 	P00 = !P00;
 }
 
-void T0() interrupt 1
+void Timer0() interrupt 1	// 输出pwm控制计时器
 {
 	write();
 }
 
-void T1() interrupt 3
+void Timer1() interrupt 3
 {
 	Interrupttimes++;
 }
@@ -35,8 +35,8 @@ void T1() interrupt 3
 void main()
 {
 	int i = 0;
-	int singleTime = 0;
-	int sign = 1;
+	int singleTime = 0;		// 用于保存单个音符时间
+	int sign = 1;					// 是否调整发声频率控制符
 	int temple = 0;
 
 	//24MHz = 20*10^6hz
@@ -62,9 +62,9 @@ void main()
 	
 	TMOD = 0x00;
 	
-	TL0 = 0x00;	
+	TL0 = 0x00;	// 计时器0,声音频率控制
 	TH0 = 0x00;		
-	TL1 = 0xef;	// 5ms一次中断
+	TL1 = 0xef;	// 5ms一次中断   ,计时器1,音符控制计时器
 	TH1 = 0xd8;
 	
 	TR1 = 1;
@@ -75,30 +75,30 @@ void main()
 	
 	EA = 1;
 	
-	P00 = 0;
+	P00 = 0;		// 初始化,给输出置零
 	P10 = 0;
 	
 
-
+	// 演奏主循环
 	while(1)
 	{
 						
-		if (sign == 1)	//重载
+		if (sign == 1)	//sign=1表示需要重载
 		{
-			singleTime = (12000 / speed) * time[i] - 4;	// -4 因为要停顿
+			singleTime = (12000 / speed) * time[i] - 4;	// 计算单个音符的时间 -4 因为要停顿
 			Interrupttimes = 0;
-			// 更改t0高低八位
+			// 更改t0高低八位 以调整频率
 			Timer0H = soundTrack[i][0];
 			Timer0L = soundTrack[i][1];
-			if (Timer0H == 0xff && Timer0L == 0xff)
+			if (Timer0H == 0xff && Timer0L == 0xff)		// 检查要载入的高低八位值,都是0xff表示载入的是停顿符
 			{
-				ET0 = 0;				//不允许中断 停顿用
+				ET0 = 0;				//不允许中断,中断函数不起作用,蜂鸣器不振动,不发出声音 停顿用
 			}
 			else							// 允许发声
 			{
-				TH0 = Timer0H;
+				TH0 = Timer0H;	// 载入频率
 				TL0 = Timer0L;
-				ET0 = 1;
+				ET0 = 1;				// 中断使能
 			}
 			sign = 4;
 		}
@@ -111,11 +111,14 @@ void main()
 			sign = 2;
 			i++;
 		}
-		// 判断时间到没到
+		// 判断:演奏单个音符的时间到了
 		if (singleTime < Interrupttimes)
 		{
 			sign --;	// 设置停顿并重载标记
 		}
+		
+		
+		// 长度到了乐谱末尾,退出播放
 		if (i >= length)
 		{break;}
 		
