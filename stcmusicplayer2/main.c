@@ -35,7 +35,7 @@ void Timer1() interrupt 3
 void main()
 {
 	int i = 0;
-	int endTime = 0;		// 用于保存单个音符时间
+	unsigned long int endTime = 0;		// 用于保存单个音符时间
 	int sign = 1;					// 是否调整发声频率控制符
 	int temple = 0;
 	int stop_time = 10;		// 间隔时间
